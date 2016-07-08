@@ -124,7 +124,7 @@ public:
 	libsc::Ldc1000 *Ldc1000_1;
 
 	libutil::KalmanFilter* middleSensorF;
-	libbase::k60::Adc* adcSensor;
+
 
 
 
