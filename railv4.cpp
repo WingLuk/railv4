@@ -42,10 +42,6 @@ void Railcar::config(){
 	button2 = new Button(ButtonConfig1);
 
 
-	Adc::Config adc_config;
-	adc_config.adc = libbase::k60::Adc::Name::kAdc1Ad12;
-	adcSensor = new Adc(adc_config);
-
 
 
 
@@ -101,16 +97,11 @@ void Railcar::steering(){
 //		angle = turningMiddle +(tKp*tError + tKd*(tError - tPreError));
 //	}
 //	if(abs(leftSensor - rightSensor) > noise){
-		if(leftSensor > rightSensor){
-			tError = leftSensor - rightSensor;
-			angle = turningMiddle +(tKpl*tError + tKdl*(tError - tPreError));
-		}
-		else{
-
+		
 		tError = leftSensor - rightSensor;
 		angle = turningMiddle +(tKp*tError + tKd*(tError - tPreError));
 
-		}
+	
 //	}
 //
 //	else{
