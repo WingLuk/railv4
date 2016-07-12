@@ -1,0 +1,161 @@
+#include "railv1.h"
+#include <libutil/pGrapher.h>
+#include <libsc/ldc1000.h>
+#include "RailPathController.h"
+
+
+
+
+namespace libbase
+{
+	namespace k60
+	{
+
+		Mcg::Config Mcg::GetMcgConfig()
+		{
+			Mcg::Config config;
+			config.external_oscillator_khz = 50000;
+			config.core_clock_khz = 150000;
+			return config;
+		}
+
+	}
+}
+
+using namespace libsc;
+using namespace libbase::k60;
+using namespace libutil;
+
+
+
+int main(void)
+{
+
+  	Timer::TimerInt t = 0;
+
+	System::Init();
+	Railcar run;
+	run.config();
+//	run.checkReading();
+
+	RailPathController Pathcontroller;
+	pGrapher pg;
+//	pg.addWatchedVar(&run.f1,"f1");
+//	pg.addWatchedVar(&run.f2,"f2");
+//	pg.addWatchedVar(&run.f3,"f3");
+	pg.addWatchedVar(&run.leftSensor, "leftSensor");
+	pg.addWatchedVar(&run.rightSensor, "rightSensor");
+	pg.addWatchedVar(&run.middleSensor,"middleSensor");
+//	pg.addWatchedVar(&run.rightMean, "rightMean");
+//	pg.addWatchedVar(&run.middleMean, "middleSensor");
+//	pg.addWatchedVar(&run.middleOut, "middleOut");
+//	pg.addWatchedVar(&run.temp1,"temp1");
+//	pg.addWatchedVar(&run.temp2,"temp2");
+//	pg.addWatchedVar(&run.plusValue,"plus");
+//	pg.addWatchedVar(&run.crossValue,"cross");
+//	pg.addWatchedVar(&run.leftMin,"leftMin");
+////	pg.addWatchedVar(&run.rightMax, "rightMax");
+//	pg.addWatchedVar(&run.angle,"angle");
+//	pg.addWatchedVar(&run.tPreError,"tPreError");
+
+
+
+
+
+
+
+
+	pg.addSharedVar(&run.tKp,"tKp");
+	pg.addSharedVar(&run.runSpeed, "speed");
+	pg.addSharedVar(&run.tKd,"tKd");
+	pg.addSharedVar(&run.noise,"noise");
+	pg.addSharedVar(&run.tKd,"tKd");
+
+	pg.addSharedVar(&run.turningMiddle,"turningMiddle");
+
+//	pg.addSharedVar(&run.MaxBound,"MaxBound");
+//	pg.addSharedVar(&run.MinBound,"MinBound");
+
+
+
+
+
+
+
+	while (1){
+		if (t == System::Time()) continue;
+		t = System::Time();
+		if(t % 10 == 0){
+			run.collectSensorData();
+			run.filtering();
+			if(!run.Start){
+				if(run.button1->IsDown()){
+					run.leftMax = run.leftSensor;
+					run.rightMax = run.rightSensor;
+//					run.middleMax = run.middleSensor;
+					run.Led0->SetEnable(true);
+
+				}
+
+				if(run.button2->IsDown()){
+					run.leftMin = run.leftSensor;
+					run.rightMin = run.rightSensor;
+					run.middleMin = run.middleSensor;
+					run.Led0->SetEnable(false);
+
+					run.mapping();
+					run.flag2 = 1;
+				}
+//				if(run.button1 -> IsDown() && run.flag2 == 1){
+//					run.LeftInMiddle = run.leftSensor;
+//					run.RightInMIddle = run.rightSensor;
+//				}
+				if(t % 20 == 0){
+							pg.sendWatchData();
+
+				}
+
+
+			}
+
+			if(run.Start){
+				run.steering();
+				run.motor->SetPower(run.runSpeed);
+
+
+
+			if(t % 20 == 0){
+						pg.sendWatchData();
+
+			}
+
+
+
+		}
+//		if(run.button1->IsDown()){
+//			run.leftMax = run.leftSensor;
+//			run.rightMax = run.rightSensor;
+//			run.Led2->SetEnable(true);
+//		}
+//
+//		if(run.button2->IsDown()){
+//			run.leftMin = run.leftSensor;
+//			run.rightMin = run.rightSensor;
+//			run.mapping();
+//
+//		}
+
+//		if(run.button1->IsDown()){
+//			run.MaxReading = (run.leftSensor+run.rightSensor)/2;
+//		}
+//
+//		if(run.button2->IsDown()){
+//			run.MinReading = (run.leftSensor+run.rightSensor)/2;
+//		}
+
+	}
+	}
+
+	return 0;
+}
+
